@@ -11,14 +11,14 @@ import sys
 
 
 def pose_client():
-    client = actionlib.SimpleActionClient('/jaco/finger_joint_angles', jaco_msgs.msg.SetFingersPositionAction)
+    client = actionlib.SimpleActionClient('/jaco_arm_driver/fingers/finger_positions', jaco_msgs.msg.SetFingersPositionAction)
 
     goal = jaco_msgs.msg.SetFingersPositionGoal()
 
     if len(sys.argv) < 4:
-        goal.fingers.finger1 = 4000
-        goal.fingers.finger2 = 4000
-        goal.fingers.finger3 = 4000
+        goal.fingers.finger1 = 0
+        goal.fingers.finger2 = 0
+        goal.fingers.finger3 = 0
 
         rospy.logwarn("Using test goal: \n%s", goal)
     else:

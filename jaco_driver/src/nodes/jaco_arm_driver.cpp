@@ -12,6 +12,7 @@
 #include "jaco_driver/jaco_angles_action.h"
 #include "jaco_driver/jaco_fingers_action.h"
 #include "jaco_driver/jaco_trajectory_action.h"
+#include "jaco_driver/jaco_gripper_action.h"
 #include "jaco_driver/joystick_command_translator.h"
 
 
@@ -28,11 +29,12 @@ int main(int argc, char **argv)
         {
             jaco::JacoComm comm(nh, api_mutex, is_first_init);
             jaco::JacoArm jaco(comm, nh);
-            jaco::JacoPoseActionServer pose_server(comm, nh);
-            jaco::JacoAnglesActionServer angles_server(comm, nh);
+            //jaco::JacoPoseActionServer pose_server(comm, nh);
+            //jaco::JacoAnglesActionServer angles_server(comm, nh);
             jaco::JacoFingersActionServer fingers_server(comm, nh);
             jaco::JacoTrajectoryActionServer trajectory_server(comm, nh);
-            jaco::JoystickCommandTranslator joystick_translator(comm, nh);
+            jaco::JacoGripperActionServer gripper_server(comm, nh);
+            //jaco::JoystickCommandTranslator joystick_translator(comm, nh);
 
             ros::spin();
         }

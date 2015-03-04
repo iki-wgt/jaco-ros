@@ -356,14 +356,14 @@ void JacoArm::publishJointAngles(void)
     joint_state.velocity[4] = current_vels.Actuator5;
     joint_state.velocity[5] = current_vels.Actuator6;
 
-    ROS_DEBUG_THROTTLE(0.1,
-                       "Raw joint velocities: %f %f %f %f %f %f",
-                       joint_state.velocity[0],
-                       joint_state.velocity[1],
-                       joint_state.velocity[2],
-                       joint_state.velocity[3],
-                       joint_state.velocity[4],
-                       joint_state.velocity[5]);
+    ROS_DEBUG_THROTTLE_NAMED(0.1,"raw",
+                             "Raw joint velocities: %f %f %f %f %f %f",
+                             joint_state.velocity[0],
+                             joint_state.velocity[1],
+                             joint_state.velocity[2],
+                             joint_state.velocity[3],
+                             joint_state.velocity[4],
+                             joint_state.velocity[5]);
 
     if (convert_joint_velocities_) {
         convertKinDeg(joint_state.velocity);
@@ -388,14 +388,14 @@ void JacoArm::publishJointAngles(void)
     joint_state.effort[7] = 0.0;
     joint_state.effort[8] = 0.0;
 
-    ROS_DEBUG_THROTTLE(0.1,
-                       "Raw joint torques: %f %f %f %f %f %f",
-                       joint_state.effort[0],
-                       joint_state.effort[1],
-                       joint_state.effort[2],
-                       joint_state.effort[3],
-                       joint_state.effort[4],
-                       joint_state.effort[5]);
+    ROS_DEBUG_THROTTLE_NAMED(0.1,"raw",
+                             "Raw joint torques: %f %f %f %f %f %f",
+                             joint_state.effort[0],
+                             joint_state.effort[1],
+                             joint_state.effort[2],
+                             joint_state.effort[3],
+                             joint_state.effort[4],
+                             joint_state.effort[5]);
 
     joint_angles_publisher_.publish(jaco_angles);
     joint_state_publisher_.publish(joint_state);

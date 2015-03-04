@@ -13,7 +13,7 @@
         <chain base_link="jaco_link_base" tip_link="jaco_link_hand" />
     </group>
     <group name="gripper">
-        <link name="jaco_link_hand" />
+        <!--link name="jaco_link_hand" /-->
         <link name="jaco_link_finger_1" />
         <link name="jaco_link_finger_2" />
         <link name="jaco_link_finger_3" />

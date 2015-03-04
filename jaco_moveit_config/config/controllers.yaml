@@ -11,7 +11,11 @@ controller_list:
         - jaco_joint_4
         - jaco_joint_5
         - jaco_joint_6
+  - name: /jaco_arm_driver/fingers
+    action_ns: gripper_action
+    type: GripperCommand
+    default: true
+    joints:
         - jaco_joint_finger_1
         - jaco_joint_finger_2
         - jaco_joint_finger_3
-
