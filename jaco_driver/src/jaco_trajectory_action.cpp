@@ -34,7 +34,7 @@ JacoTrajectoryActionServer::~JacoTrajectoryActionServer()
 
 void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal)
 {
-  std::cout << "goal: " << *goal << std::endl;
+  //std::cout << "goal: " << *goal << std::endl;
   try
   {
     if (arm_comm_.isStopped())

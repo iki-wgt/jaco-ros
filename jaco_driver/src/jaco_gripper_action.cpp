@@ -30,6 +30,10 @@ JacoGripperActionServer::JacoGripperActionServer(JacoComm &arm_comm, const ros::
   node_handle_.param<double>("tolerance", tolerance, 2.0);
   tolerance_ = static_cast<float>(tolerance);
 
+
+  arm_comm_.initFingers();
+  ros::Duration(1).sleep();
+
   action_server_.start();
   ROS_INFO_STREAM("JACO Gripper action server has started.");
 }
@@ -40,6 +44,8 @@ JacoGripperActionServer::~JacoGripperActionServer()
 
 void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandGoalConstPtr &goal)
 {
+  std::cout << "actionCallback: " << *goal << std::endl;
+
   FingerAngles current_finger_positions;
   ros::Time current_time = ros::Time::now();
 
@@ -63,6 +69,8 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
     const static double FULLY_CLOSED_URDF = 0.697;
 
     double position = goal->command.position * FULLY_CLOSED / FULLY_CLOSED_URDF;
+    position = std::max(0.0, 6400.0 - position);
+    ROS_DEBUG_STREAM_NAMED("gripper","Converted position: " << position);
 
     jaco_msgs::FingerPosition finger_position;
     finger_position.finger1 = position;
@@ -80,7 +88,7 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
     {
       ros::spinOnce();
 
-      if (action_server_.isPreemptRequested() || !ros::ok())
+      /*      if (action_server_.isPreemptRequested() || !ros::ok())
       {
         ROS_DEBUG_STREAM_NAMED("gripper","Preempt requested");
         //result.fingers = current_finger_positions.constructFingersMsg();
@@ -89,9 +97,10 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
         action_server_.setPreempted(); //result);
         return;
       }
-      else if (arm_comm_.isStopped())
+      else */
+      if (arm_comm_.isStopped())
       {
-        ROS_DEBUG_STREAM_NAMED("gripper","Arm is stopped");
+        ROS_WARN_STREAM_NAMED("gripper","Arm is stopped");
         //result.fingers = current_finger_positions.constructFingersMsg();
         action_server_.setAborted(); //result);
         return;
