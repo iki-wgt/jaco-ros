@@ -1,6 +1,8 @@
 <launch>
 
-  <arg name="use_urdf" default="false"/>
+  <node pkg="tf" type="static_transform_publisher" name="root_to_world" args="0.5 0 1.045 1.57 0 0 /world /root 50" />
+
+  <arg name="use_urdf" default="true"/>
 
   <node name="jaco_arm_driver" pkg="jaco_driver" type="jaco_arm_driver" output="screen" cwd="node">
     <!-- Set this parameter to use a specific arm on your system    --> 

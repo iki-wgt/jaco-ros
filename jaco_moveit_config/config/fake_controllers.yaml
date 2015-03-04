@@ -9,7 +9,6 @@ controller_list:
       - jaco_joint_6
   - name: fake_gripper_controller
     joints:
-      - jaco_joint_6
       - jaco_joint_finger_1
       - jaco_joint_finger_2
       - jaco_joint_finger_3

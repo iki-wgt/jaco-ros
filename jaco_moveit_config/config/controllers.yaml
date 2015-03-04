@@ -1,7 +1,7 @@
 controller_manager_ns: moveit_simple_controller_manager
 controller_list:
-  - name: "jaco_arm_driver"
-    action_ns: controller/follow_joint_trajectory
+  - name: /jaco_arm_driver/controller
+    action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     default: true
     joints:
@@ -11,4 +11,7 @@ controller_list:
         - jaco_joint_4
         - jaco_joint_5
         - jaco_joint_6
+        - jaco_joint_finger_1
+        - jaco_joint_finger_2
+        - jaco_joint_finger_3
 
