@@ -13,27 +13,33 @@
         <chain base_link="jaco_link_base" tip_link="jaco_link_hand" />
     </group>
     <group name="gripper">
-        <!--link name="jaco_link_hand" /-->
         <link name="jaco_link_finger_1" />
         <link name="jaco_link_finger_2" />
         <link name="jaco_link_finger_3" />
     </group>
+    <group name="whole_body">
+        <group name="manipulator" />
+        <group name="gripper" />
+    </group>
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
-    <group_state name="HOME" group="manipulator">
+    <group_state name="home" group="whole_body">
         <joint name="jaco_joint_1" value="-1.7293" />
         <joint name="jaco_joint_2" value="-1.7342" />
         <joint name="jaco_joint_3" value="0.7016" />
         <joint name="jaco_joint_4" value="-0.8139" />
         <joint name="jaco_joint_5" value="1.5164" />
         <joint name="jaco_joint_6" value="3.1415" />
+        <joint name="jaco_joint_finger_1" value="0" />
+        <joint name="jaco_joint_finger_2" value="0" />
+        <joint name="jaco_joint_finger_3" value="0" />	
     </group_state>
     <group_state name="goal_bin_pose" group="manipulator">
-      <joint name="jaco_joint_1" value="-0.0510123" />
-      <joint name="jaco_joint_2" value="-0.432787" />
-      <joint name="jaco_joint_3" value="-0.732461" />
-      <joint name="jaco_joint_4" value="2.90716" />
-      <joint name="jaco_joint_5" value="2.52279" />
-      <joint name="jaco_joint_6" value="-0.654498" />
+        <joint name="jaco_joint_1" value="-0.0510123" />
+        <joint name="jaco_joint_2" value="-0.432787" />
+        <joint name="jaco_joint_3" value="-0.732461" />
+        <joint name="jaco_joint_4" value="2.90716" />
+        <joint name="jaco_joint_5" value="2.52279" />
+        <joint name="jaco_joint_6" value="-0.654498" />
     </group_state>
     <group_state name="UPRIGHT" group="manipulator">
         <joint name="jaco_joint_1" value="0" />
