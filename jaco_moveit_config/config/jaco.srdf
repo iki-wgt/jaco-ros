@@ -27,6 +27,14 @@
         <joint name="jaco_joint_5" value="1.5164" />
         <joint name="jaco_joint_6" value="3.1415" />
     </group_state>
+    <group_state name="goal_bin_pose" group="manipulator">
+      <joint name="jaco_joint_1" value="-0.0510123" />
+      <joint name="jaco_joint_2" value="-0.432787" />
+      <joint name="jaco_joint_3" value="-0.732461" />
+      <joint name="jaco_joint_4" value="2.90716" />
+      <joint name="jaco_joint_5" value="2.52279" />
+      <joint name="jaco_joint_6" value="-0.654498" />
+    </group_state>
     <group_state name="UPRIGHT" group="manipulator">
         <joint name="jaco_joint_1" value="0" />
         <joint name="jaco_joint_2" value="-1.571" />
