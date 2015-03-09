@@ -20,7 +20,7 @@ link_directories(${PROJECT_SOURCE_DIR}/lib/${CMAKE_LIBRARY_ARCHITECTURE})
 
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES kinova_driver
+  LIBRARIES kinova_library
   CATKIN_DEPENDS actionlib actionlib_msgs geometry_msgs kinova_msgs roscpp rospy sensor_msgs std_msgs tf
 #  DEPENDS system_lib
 )
@@ -41,11 +41,8 @@ include_directories(
 #add_executable(test_jaco_arm_vel src/testers/test_jaco_arm_vel.cpp )
 #add_executable(test_jaco_arm_car_vel src/testers/test_jaco_arm_car_vel.cpp )
 
-# Nodes
-# Note, the headers are shown here so they show up in the project view when using
-# Qt Creator. There must be a better way...
-add_executable(jaco_arm_driver
-  src/nodes/jaco_arm_driver.cpp
+# Libraries
+add_library(kinova_library
   src/jaco_api.cpp
   src/jaco_arm.cpp
   src/jaco_comm.cpp
@@ -54,16 +51,20 @@ add_executable(jaco_arm_driver
   src/jaco_fingers_action.cpp
   src/jaco_types.cpp
 )
+target_link_libraries(kinova_library ${catkin_LIBRARIES} dl)
+
+# Nodes
+add_executable(jaco_arm_driver
+  src/nodes/jaco_arm_driver.cpp
+)
+target_link_libraries(jaco_arm_driver kinova_library ${catkin_LIBRARIES})
+add_dependencies(jaco_arm_driver ${catkin_EXPORTED_TARGETS}) # for ros messages
 
 add_executable(jaco_tf_updater
   src/nodes/jaco_tf_updater.cpp
   src/jaco_arm_kinematics.cpp
 )
-
-add_dependencies(jaco_arm_driver ${catkin_EXPORTED_TARGETS})
 add_dependencies(jaco_tf_updater ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(jaco_arm_driver ${catkin_LIBRARIES} dl)
 target_link_libraries(jaco_tf_updater ${catkin_LIBRARIES})
 
 #############

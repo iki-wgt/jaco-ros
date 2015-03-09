@@ -68,6 +68,9 @@ class JacoComm
     bool isHomed(void);
     void homeArm(void);
     void initFingers(void);
+    void initTrajectory(void);
+    void addTrajectoryPoint(const TrajectoryPoint &point);
+    void getActualTrajectoryInfo(TrajectoryPoint& currentPoint);
     void setJointAngles(const JacoAngles &angles, int timeout = 0, bool push = true);
     void setCartesianPosition(const JacoPose &position, int timeout = 0, bool push = true);
     void setFingerPositions(const FingerAngles &fingers, int timeout = 0, bool push = true);
