@@ -11,7 +11,8 @@
 #include "kinova_driver/jaco_pose_action.h"
 #include "kinova_driver/jaco_angles_action.h"
 #include "kinova_driver/jaco_fingers_action.h"
-
+#include "kinova_driver/jaco_trajectory_action.h"
+#include "kinova_driver/jaco_gripper_action.h"
 
 int main(int argc, char **argv)
 {
@@ -29,6 +30,8 @@ int main(int argc, char **argv)
             kinova::JacoPoseActionServer pose_server(comm, nh);
             kinova::JacoAnglesActionServer angles_server(comm, nh);
             kinova::JacoFingersActionServer fingers_server(comm, nh);
+            kinova::JacoTrajectoryActionServer trajectory_server(comm, nh);
+            kinova::JacoGripperActionServer gripper_server(comm, nh);
 
             ros::spin();
         }

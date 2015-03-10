@@ -50,6 +50,8 @@ add_library(kinova_library
   src/jaco_angles_action.cpp
   src/jaco_fingers_action.cpp
   src/jaco_types.cpp
+  src/jaco_trajectory_action.cpp
+  src/jaco_gripper_action.cpp
 )
 target_link_libraries(kinova_library ${catkin_LIBRARIES} dl)
 
