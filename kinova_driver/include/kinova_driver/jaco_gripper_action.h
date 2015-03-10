@@ -37,6 +37,8 @@ private:
   double stall_threshold_;
   double rate_hz_;
   float tolerance_;
+  double                                       encoder_to_radian_ratio_;
+  double                                       radian_to_encoder_ratio_;
 };
 
 } // namespace

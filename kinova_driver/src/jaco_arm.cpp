@@ -86,7 +86,7 @@ JacoArm::JacoArm(JacoComm &arm, const ros::NodeHandle &nodeHandle)
 
     // Approximative conversion ratio from finger position (0..6000) to joint angle 
     // in radians (0..0.7).
-    node_handle_.param("finger_angle_conv_ratio", finger_conv_ratio_, 0.7 / 5000.0);
+    node_handle_.param("finger_angle_conv_ratio", finger_conv_ratio_, M_PI/180*40 / 6600.0);
 
     // Depending on the API version, the arm might return velocities in the
     // 0..360 range (0..180 for positive values, 181..360 for negative ones).
@@ -319,24 +319,27 @@ void JacoArm::jointVelocityTimer(const ros::TimerEvent&)
  */
 void JacoArm::publishJointAngles(void)
 {
-    FingerAngles fingers;
-    jaco_comm_.getFingerPositions(fingers);
+    // Create joint state msg
+    sensor_msgs::JointState joint_state;
+    joint_state.name = joint_names_;
+    joint_state.header.stamp = ros::Time::now();
 
     // Query arm for current joint angles
     JacoAngles current_angles;
     jaco_comm_.getJointAngles(current_angles);
     kinova_msgs::JointAngles jaco_angles = current_angles.constructAnglesMsg();
 
+    // Query fingers for current joint angles
+    FingerAngles fingers;
+    jaco_comm_.getFingerPositions(fingers);
+
+    // Copy arm joints
     jaco_angles.joint1 = current_angles.Actuator1;
     jaco_angles.joint2 = current_angles.Actuator2;
     jaco_angles.joint3 = current_angles.Actuator3;
     jaco_angles.joint4 = current_angles.Actuator4;
     jaco_angles.joint5 = current_angles.Actuator5;
     jaco_angles.joint6 = current_angles.Actuator6;
-
-    sensor_msgs::JointState joint_state;
-    joint_state.name = joint_names_;
-    joint_state.header.stamp = ros::Time::now();
 
     // Transform from Kinova DH algorithm to physical angles in radians, then place into vector array
     joint_state.position.resize(9);

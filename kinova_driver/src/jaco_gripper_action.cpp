@@ -30,6 +30,13 @@ JacoGripperActionServer::JacoGripperActionServer(JacoComm &arm_comm, const ros::
   node_handle_.param<double>("tolerance", tolerance, 2.0);
   tolerance_ = static_cast<float>(tolerance);
 
+  // Approximative conversion ratio 
+  // from finger position (0..6000) 
+  // to joint angle in radians (0..0.697).
+  const static double FULLY_CLOSED = 6600;
+  const static double FULLY_CLOSED_URDF = M_PI/180*40; //0.697;
+  encoder_to_radian_ratio_ = FULLY_CLOSED_URDF / FULLY_CLOSED;
+  radian_to_encoder_ratio_ = FULLY_CLOSED / FULLY_CLOSED_URDF;
 
   arm_comm_.initFingers();
   ros::Duration(1).sleep();
@@ -64,18 +71,10 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
     last_nonstall_time_ = current_time;
     last_nonstall_finger_positions_ = current_finger_positions;
 
-    // The range of input for all three fingers on the JACO is approximately 0 (fully open) to 60 (fully closed)
-    const static double FULLY_CLOSED = 6400;
-    const static double FULLY_CLOSED_URDF = 0.697;
-
-    double position = goal->command.position * FULLY_CLOSED / FULLY_CLOSED_URDF;
-    position = std::max(0.0, 6400.0 - position);
-    ROS_DEBUG_STREAM_NAMED("gripper","Converted position: " << position);
-
     kinova_msgs::FingerPosition finger_position;
-    finger_position.finger1 = position;
-    finger_position.finger2 = position;
-    finger_position.finger3 = position;
+    finger_position.finger1 = goal->command.position * radian_to_encoder_ratio_;
+    finger_position.finger2 = goal->command.position * radian_to_encoder_ratio_;
+    finger_position.finger3 = goal->command.position * radian_to_encoder_ratio_;
     FingerAngles target(finger_position);
 
     // Send command
