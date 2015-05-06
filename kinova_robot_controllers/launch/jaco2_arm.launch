@@ -11,6 +11,10 @@
             period: 0.01    # 100 Hz
             w_skip:   10    # Write cycle of 10 Hz
         </rosparam>
+
+        <remap from="/jaco2/joint_states" to="/joint_states"/>
+
+
     </node>
 
     <!--include file="$(find kinova_description)/launch/upload_jaco.launch"/-->
@@ -21,7 +25,11 @@
 	  output="screen" args="spawn
 				 joint_state_controller
 				 position_trajectory_controller
-				 " />
+				 ">
+
+         
+
+    </node>
     
     <node name="robot_state_publisher"
            pkg="robot_state_publisher"

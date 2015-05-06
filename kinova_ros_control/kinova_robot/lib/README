@@ -1,5 +1,7 @@
 Pre-build libraries
 -------------------
+Put the following pre-build libraries into this directory.
+Current API version 5.1.4
 
 libkinova_cmd:  Corresponds to Kinova.API.USBCommandLayerUbuntu.so, same code.
 libkinova_comm: A copy of Kinova.API.CommLayerUbuntu.so.

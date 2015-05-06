@@ -10,27 +10,17 @@
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
     <group name="jaco2_arm">
-        <link name="jaco2_link_1" />
-        <link name="jaco2_link_2" />
-        <link name="jaco2_link_3" />
-        <link name="jaco2_link_4" />
-        <link name="jaco2_link_5" />
-        <link name="jaco2_link_hand" />
-        <joint name="jaco2_joint_1" />
-        <joint name="jaco2_joint_2" />
-        <joint name="jaco2_joint_3" />
-        <joint name="jaco2_joint_4" />
-        <joint name="jaco2_joint_5" />
-        <joint name="jaco2_joint_6" />
         <chain base_link="jaco2_link_base" tip_link="jaco2_link_hand" />
     </group>
+
+    <!--
     <group name="jaco2_gripper">
-        <joint name="jaco2_joint_finger_1" />
-        <joint name="jaco2_joint_finger_2" />
-        <joint name="jaco2_joint_finger_3" />
-    </group>
-    <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
-    <end_effector name="jaco2_end_effector" parent_link="jaco2_link_hand" group="jaco2_gripper" parent_group="jaco2_arm" />
+        <link name="jaco2_link_finger_1" />
+        <link name="jaco2_link_finger_2" />
+        <link name="jaco2_link_finger_3" />
+    </group>-->
+    <!--END EFFECTOR: Purpose: Represent information about an end effector.
+    <end_effector name="jaco2_end_effector" parent_link="jaco2_link_hand" group="jaco2_gripper"/>-->
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="jaco2_link_1" link2="jaco2_link_2" reason="Adjacent" />
     <disable_collisions link1="jaco2_link_1" link2="jaco2_link_3" reason="Never" />

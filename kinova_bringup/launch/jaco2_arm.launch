@@ -10,13 +10,14 @@
     <!-- <param name="serial_number" value="PJ00000001030703130" /> -->
     <param name="tf_prefix" value="jaco2_"/>
     <param name="finger_angle_conv_ratio" value="0.012"/>
+    <remap from="jaco2_arm_driver/out/joint_state" to="joint_states"/>
   </node>
     
   <include file="$(find kinova_description)/launch/upload_jaco2.launch"/>
   <node name="jaco2_state_publisher"
          pkg="robot_state_publisher"
         type="robot_state_publisher">
-      <remap from="joint_states" to="/jaco2_arm_driver/out/joint_state"/>
+      <!--<remap from="jaco2_arm_driver/out/joint_state" to="joint_states"/>-->
   </node>
 
 </launch>
