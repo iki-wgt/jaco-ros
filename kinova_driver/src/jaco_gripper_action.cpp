@@ -24,7 +24,7 @@ JacoGripperActionServer::JacoGripperActionServer(JacoComm &arm_comm, const ros::
                    false)
 {
   double tolerance;
-  node_handle_.param<double>("stall_interval_seconds", stall_interval_seconds_, 0.5);
+  node_handle_.param<double>("stall_interval_seconds", stall_interval_seconds_, 0.5); //if the position hasn't chaned in this time the gripper is assumed to be stalled.
   node_handle_.param<double>("stall_threshold", stall_threshold_, 1.0);
   node_handle_.param<double>("rate_hz", rate_hz_, 10.0);
   node_handle_.param<double>("tolerance", tolerance, 2.0);
@@ -54,6 +54,7 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
   std::cout << "actionCallback: " << *goal << std::endl;
 
   FingerAngles current_finger_positions;
+
   ros::Time current_time = ros::Time::now();
 
   try
@@ -63,8 +64,8 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
     if (arm_comm_.isStopped())
     {
       ROS_INFO("Could not complete finger action because the arm is stopped");
-      //result.fingers = current_finger_positions.constructFingersMsg();
-      action_server_.setAborted(); //result);
+      result.position = current_finger_positions.Finger1 * encoder_to_radian_ratio_;
+      action_server_.setAborted(result);
       return;
     }
 
@@ -87,28 +88,33 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
     {
       ros::spinOnce();
 
-      /*      if (action_server_.isPreemptRequested() || !ros::ok())
+      arm_comm_.getFingerPositions(current_finger_positions);
+
+      result.position = current_finger_positions.Finger1 * encoder_to_radian_ratio_;
+
+      current_time = ros::Time::now();
+
+      //feedback.fingers = current_finger_positions.constructFingersMsg();
+      //action_server_.publishFeedback(feedback);
+
+      if (action_server_.isPreemptRequested() || !ros::ok())
       {
         ROS_DEBUG_STREAM_NAMED("gripper","Preempt requested");
-        //result.fingers = current_finger_positions.constructFingersMsg();
+        
         arm_comm_.stopAPI();
         arm_comm_.startAPI();
-        action_server_.setPreempted(); //result);
-        return;
-      }
-      else */
-      if (arm_comm_.isStopped())
-      {
-        ROS_WARN_STREAM_NAMED("gripper","Arm is stopped");
-        //result.fingers = current_finger_positions.constructFingersMsg();
-        action_server_.setAborted(); //result);
+        action_server_.setPreempted(result);
         return;
       }
 
-      arm_comm_.getFingerPositions(current_finger_positions);
-      current_time = ros::Time::now();
-      //feedback.fingers = current_finger_positions.constructFingersMsg();
-      //action_server_.publishFeedback(feedback);
+      if (arm_comm_.isStopped())
+      {
+        ROS_WARN_STREAM_NAMED("gripper","Arm is stopped");
+        action_server_.setAborted(result);
+        return;
+      }
+
+
 
       // Debug
       if (false)
@@ -119,22 +125,16 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
         std::cout << "Tolerance: " << tolerance_ << std::endl;
       }
 
-      //if (target.isCloseToOther(current_finger_positions, tolerance_))
-      //{
-
-      ros::Duration(2).sleep();
+      if (target.isCloseToOther(current_finger_positions, tolerance_))
+      {
         ROS_DEBUG_STREAM_NAMED("gripper","Succeeded - positions are within tolerance");
-
-        // Check if the action has succeeeded
-        //result.fingers = current_finger_positions.constructFingersMsg();
-        action_server_.setSucceeded(); //result);
+        result.reached_goal = true;
+        action_server_.setSucceeded(result); //result);
         return;
-
-        /*
       }
       else if (!last_nonstall_finger_positions_.isCloseToOther(current_finger_positions, stall_threshold_))
       {
-        //ROS_DEBUG_STREAM_NAMED("gripper","Not close enough yet but not stalled yet");
+        ROS_DEBUG_STREAM_NAMED("gripper","Not close enough yet but not stalled yet");
         // Check if we are outside of a potential stall condition
         last_nonstall_time_ = current_time;
         last_nonstall_finger_positions_ = current_finger_positions;
@@ -144,7 +144,6 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
         ROS_DEBUG_STREAM_NAMED("gripper","Has been stalled over " << stall_interval_seconds_ << " seconds");
 
         // Check if the full stall condition has been meet
-        //result.fingers = current_finger_positions.constructFingersMsg();
         arm_comm_.stopAPI();
         arm_comm_.startAPI();
         action_server_.setPreempted(); //result);
