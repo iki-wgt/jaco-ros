@@ -54,17 +54,21 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
   std::cout << "actionCallback: " << *goal << std::endl;
 
   FingerAngles current_finger_positions;
+  control_msgs::GripperCommandResult result;
+  control_msgs::GripperCommandFeedback feedback;
+
   ros::Time current_time = ros::Time::now();
 
   try
   {
     arm_comm_.getFingerPositions(current_finger_positions);
+    result.position = current_finger_positions.Finger1 * encoder_to_radian_ratio_;
 
     if (arm_comm_.isStopped())
     {
       ROS_INFO("Could not complete finger action because the arm is stopped");
       //result.fingers = current_finger_positions.constructFingersMsg();
-      action_server_.setAborted(); //result);
+      action_server_.setAborted(result); //result);
       return;
     }
 
@@ -87,26 +91,29 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
     {
       ros::spinOnce();
 
-      /*      if (action_server_.isPreemptRequested() || !ros::ok())
+      arm_comm_.getFingerPositions(current_finger_positions);
+      result.position = current_finger_positions.Finger1 * encoder_to_radian_ratio_;
+      current_time = ros::Time::now();
+
+      if (action_server_.isPreemptRequested() || !ros::ok())
       {
         ROS_DEBUG_STREAM_NAMED("gripper","Preempt requested");
         //result.fingers = current_finger_positions.constructFingersMsg();
         arm_comm_.stopAPI();
         arm_comm_.startAPI();
-        action_server_.setPreempted(); //result);
+        action_server_.setPreempted(result);
         return;
       }
-      else */
+
       if (arm_comm_.isStopped())
       {
         ROS_WARN_STREAM_NAMED("gripper","Arm is stopped");
         //result.fingers = current_finger_positions.constructFingersMsg();
-        action_server_.setAborted(); //result);
+        action_server_.setAborted(result);
         return;
       }
 
-      arm_comm_.getFingerPositions(current_finger_positions);
-      current_time = ros::Time::now();
+
       //feedback.fingers = current_finger_positions.constructFingersMsg();
       //action_server_.publishFeedback(feedback);
 
@@ -127,7 +134,10 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
 
         // Check if the action has succeeeded
         //result.fingers = current_finger_positions.constructFingersMsg();
-        action_server_.setSucceeded(); //result);
+        arm_comm_.getFingerPositions(current_finger_positions);
+        result.position = current_finger_positions.Finger1 * encoder_to_radian_ratio_;
+        result.reached_goal = true;
+        action_server_.setSucceeded(result);
         return;
 
         /*
@@ -158,7 +168,7 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
   {
     //result.fingers = current_finger_positions.constructFingersMsg();
     ROS_ERROR_STREAM(e.what());
-    action_server_.setAborted(); //result);
+    action_server_.setAborted(result);
   }
 
   ROS_WARN_STREAM_NAMED("gripper","Should we have gotten here?");
