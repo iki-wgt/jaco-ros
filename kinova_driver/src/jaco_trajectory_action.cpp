@@ -235,7 +235,7 @@ void JacoTrajectoryActionServer::convertDHAnglesToPhysical(AngularInfo &angles)
   angles.Actuator3 =  90 - angles.Actuator3;
   angles.Actuator4 = 180 - angles.Actuator4;
   angles.Actuator5 = 180 - angles.Actuator5;
-  angles.Actuator6 = 260 - angles.Actuator6;
+  angles.Actuator6 = 270 - angles.Actuator6;
 }
 
 /**
@@ -250,7 +250,7 @@ void JacoTrajectoryActionServer::convertPhysicalAnglesToDH(AngularInfo &angles)
   angles.Actuator3 =  90 - angles.Actuator3;
   angles.Actuator4 = 180 - angles.Actuator4;
   angles.Actuator5 = 180 - angles.Actuator5;
-  angles.Actuator6 = 260 - angles.Actuator6;
+  angles.Actuator6 = 270 - angles.Actuator6;
 }
 
 /**
