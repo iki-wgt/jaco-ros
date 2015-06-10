@@ -119,14 +119,18 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
         std::cout << "Tolerance: " << tolerance_ << std::endl;
       }
 
-      if (target.isCloseToOther(current_finger_positions, tolerance_))
-      {
+      //if (target.isCloseToOther(current_finger_positions, tolerance_))
+      //{
+
+      ros::Duration(2).sleep();
         ROS_DEBUG_STREAM_NAMED("gripper","Succeeded - positions are within tolerance");
 
         // Check if the action has succeeeded
         //result.fingers = current_finger_positions.constructFingersMsg();
         action_server_.setSucceeded(); //result);
         return;
+
+        /*
       }
       else if (!last_nonstall_finger_positions_.isCloseToOther(current_finger_positions, stall_threshold_))
       {
@@ -145,7 +149,7 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
         arm_comm_.startAPI();
         action_server_.setPreempted(); //result);
         return;
-      }
+      }*/
 
       ros::Rate(rate_hz_).sleep();
     }
