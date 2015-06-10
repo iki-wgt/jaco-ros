@@ -18,7 +18,7 @@ namespace kinova
 
 JacoGripperActionServer::JacoGripperActionServer(JacoComm &arm_comm, const ros::NodeHandle &nh)
   : arm_comm_(arm_comm),
-    node_handle_(nh, "fingers"),
+    node_handle_(nh, "/gripper_controller"),
     action_server_(node_handle_, "gripper_action",
                    boost::bind(&JacoGripperActionServer::actionCallback, this, _1),
                    false)
