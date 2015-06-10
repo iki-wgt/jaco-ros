@@ -129,7 +129,7 @@
             <origin xyz="${joint_base_origin_xyz}" rpy="${joint_base_origin_rpy}"/>
         </joint>
         <xacro:jaco_link link_name="${link_1}" link_mass="${link_1_mass}" link_cog="${link_1_cog}" link_ixx="${link_1_ixx}" link_ixy="${link_1_ixy}" link_ixz="${link_1_ixz}" link_iyy="${link_1_iyy}" link_iyz="${link_1_iyz}" link_izz="${link_1_izz}"/>
-        <xacro:jaco_joint joint_name="${joint_1}" type="continuous" parent="${link_base}" child="${link_1}" joint_axis_xyz="${joint_1_axis_xyz}" joint_origin_xyz="${joint_1_origin_xyz}" joint_origin_rpy="${joint_1_origin_rpy}" joint_lower_limit="${joint_1_lower_limit}" joint_upper_limit="${joint_1_upper_limit}"/>
+        <xacro:jaco_joint joint_name="${joint_1}" type="revolute" parent="${link_base}" child="${link_1}" joint_axis_xyz="${joint_1_axis_xyz}" joint_origin_xyz="${joint_1_origin_xyz}" joint_origin_rpy="${joint_1_origin_rpy}" joint_lower_limit="${joint_1_lower_limit}" joint_upper_limit="${joint_1_upper_limit}"/>
 
         <xacro:jaco_link link_name="${link_2}" link_mass="${link_2_mass}" link_cog="${link_2_cog}" link_ixx="${link_2_ixx}" link_ixy="${link_2_ixy}" link_ixz="${link_2_ixz}" link_iyy="${link_2_iyy}" link_iyz="${link_2_iyz}" link_izz="${link_2_izz}"/>
         <xacro:jaco_joint joint_name="${joint_2}" type="revolute" parent="${link_1}" child="${link_2}" joint_axis_xyz="${joint_2_axis_xyz}" joint_origin_xyz="${joint_2_origin_xyz}" joint_origin_rpy="${joint_2_origin_rpy}" joint_lower_limit="${joint_2_lower_limit}" joint_upper_limit="${joint_2_upper_limit}"/>
