@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 #######################################
 
 add_message_files(
+  DIRECTORY msg
   FILES
   FingerPosition.msg
   JointAngles.msg
@@ -43,5 +44,10 @@ generate_messages(
 
 catkin_package(
   CATKIN_DEPENDS actionlib_msgs geometry_msgs message_runtime
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
 )
 

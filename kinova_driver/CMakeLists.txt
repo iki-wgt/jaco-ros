@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(kinova_driver)
 
-find_package(catkin REQUIRED dynamic_reconfigure COMPONENTS
+find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
   geometry_msgs
@@ -11,6 +11,8 @@ find_package(catkin REQUIRED dynamic_reconfigure COMPONENTS
   sensor_msgs
   std_msgs
   tf
+  dynamic_reconfigure
+  angles
 )
 generate_dynamic_reconfigure_options(
   #cfg/JacoPositionConfig.cfg
@@ -54,11 +56,13 @@ add_library(kinova_library
   src/jaco_gripper_action.cpp
 )
 target_link_libraries(kinova_library ${catkin_LIBRARIES} dl)
+add_dependencies(kinova_library ${catkin_EXPORTED_TARGETS})
 
 # Nodes
 add_executable(jaco_arm_driver
   src/nodes/jaco_arm_driver.cpp
 )
+message(STATUS ${catkin_EXPORTED_TARGETS})
 target_link_libraries(jaco_arm_driver kinova_library ${catkin_LIBRARIES})
 add_dependencies(jaco_arm_driver ${catkin_EXPORTED_TARGETS}) # for ros messages
 
@@ -94,7 +98,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 
 ## Mark executables and/or libraries for installation
-install(TARGETS jaco_arm_driver jaco_tf_updater
+install(TARGETS jaco_arm_driver jaco_tf_updater kinova_library
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
