@@ -23,13 +23,16 @@ JacoGripperActionServer::JacoGripperActionServer(JacoComm &arm_comm, const ros::
                    boost::bind(&JacoGripperActionServer::actionCallback, this, _1),
                    false)
 {
-  double tolerance;
+
   node_handle_.param<double>("stall_interval_seconds", stall_interval_seconds_, 0.5);
   node_handle_.param<double>("stall_threshold", stall_threshold_, 1.0);
   node_handle_.param<double>("rate_hz", rate_hz_, 10.0);
-  node_handle_.param<double>("tolerance", tolerance, 2.0);
-  tolerance_ = static_cast<float>(tolerance);
-
+  node_handle_.param<double>("tolerance", tolerance_, 2.0);
+  /*The angle in radians at which the gripper is supposed to be fully closed, so no object was grasped
+  (fully open is 0, fully closed 0.697 (40 Degrees) but sometimes the fingers fully close to even 0.79)
+  */
+  node_handle_.param<double>("fully_closed_threshold", fully_closed_threshold_, 0.65);
+  
   // Approximative conversion ratio 
   // from finger position (0..6000) 
   // to joint angle in radians (0..0.697).
@@ -66,7 +69,7 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
 
     if (arm_comm_.isStopped())
     {
-      ROS_INFO("Could not complete finger action because the arm is stopped");
+      ROS_INFO_STREAM_NAMED("gripper", "Could not complete finger action because the arm is stopped");
       //result.fingers = current_finger_positions.constructFingersMsg();
       action_server_.setAborted(result); //result);
       return;
@@ -97,7 +100,7 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
 
       if (action_server_.isPreemptRequested() || !ros::ok())
       {
-        ROS_DEBUG_STREAM_NAMED("gripper","Preempt requested");
+        ROS_WARN_STREAM_NAMED("gripper","Preempt requested");
         //result.fingers = current_finger_positions.constructFingersMsg();
         arm_comm_.stopAPI();
         arm_comm_.startAPI();
@@ -113,7 +116,6 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
         return;
       }
 
-
       //feedback.fingers = current_finger_positions.constructFingersMsg();
       //action_server_.publishFeedback(feedback);
 
@@ -128,17 +130,28 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
 
       //if (target.isCloseToOther(current_finger_positions, tolerance_))
       //{
-
+      ROS_INFO_STREAM_NAMED("gripper","Wait 2 seconds for gripper to open/close");
       ros::Duration(2).sleep();
-        ROS_DEBUG_STREAM_NAMED("gripper","Succeeded - positions are within tolerance");
 
-        // Check if the action has succeeeded
-        //result.fingers = current_finger_positions.constructFingersMsg();
-        arm_comm_.getFingerPositions(current_finger_positions);
-        result.position = current_finger_positions.Finger1 * encoder_to_radian_ratio_;
-        result.reached_goal = true;
-        action_server_.setSucceeded(result);
+      ROS_DEBUG_STREAM_NAMED("gripper","Succeeded - positions are within tolerance");
+
+      // Check if the action has succeeeded
+      //result.fingers = current_finger_positions.constructFingersMsg();
+      arm_comm_.getFingerPositions(current_finger_positions);
+      result.position = current_finger_positions.Finger1 * encoder_to_radian_ratio_;
+
+      if(result.position >= fully_closed_threshold_){
+
+        ROS_ERROR_STREAM_NAMED("gripper","Gripper fully closed, so no object was grasped. Aborting.");
+        action_server_.setAborted(result);
         return;
+
+      }
+
+      result.reached_goal = true;
+      action_server_.setSucceeded(result);
+      ROS_INFO_STREAM_NAMED("gripper","Gripper command successfully executed.");
+      return;
 
         /*
       }
@@ -167,7 +180,7 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
   catch(const std::exception& e)
   {
     //result.fingers = current_finger_positions.constructFingersMsg();
-    ROS_ERROR_STREAM(e.what());
+    ROS_ERROR_STREAM_NAMED("gripper", "Error: " << e.what());
     action_server_.setAborted(result);
   }
 

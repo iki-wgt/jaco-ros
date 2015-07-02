@@ -24,6 +24,7 @@ namespace kinova
         ros::NodeHandle node_handle_;
         JacoComm &arm_comm_;
         actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> action_server_;
+        double controller_p_value_;
         
         void convertDHAnglesToPhysical(AngularInfo &angles);
         void convertPhysicalAnglesToDH(AngularInfo &angles);

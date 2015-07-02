@@ -11,7 +11,6 @@
 
 #define PI 3.14159265359
 #define TOLERANCE 1 // Goal tolerance in degrees
-#define KP 4 // P-regulator constant
 
 namespace kinova 
 {
@@ -24,6 +23,10 @@ JacoTrajectoryActionServer::JacoTrajectoryActionServer(JacoComm &arm_comm, const
                    boost::bind(&JacoTrajectoryActionServer::actionCallback, this, _1),
                    false)
 {
+
+  /*Sets the p value for the velocity controlled end position correction, can be seen as speed */
+  node_handle_.param<double>("controller_p_value", controller_p_value_, 2.0);
+
   action_server_.start();
   ROS_INFO_STREAM("JACO FollowJointTrajectory action server has started.");
 }
@@ -108,10 +111,12 @@ void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointT
           arm_comm_.stopAPI();
           arm_comm_.startAPI();
           action_server_.setPreempted();
+          ROS_INFO_STREAM_NAMED("trajectory_action", "Preempted by preempt request");
           return;
         } else if (arm_comm_.isStopped())
         {
           action_server_.setAborted();
+          ROS_INFO_STREAM_NAMED("trajectory_action", "Aborted because arm is stopped.");
           return;
         }
 
@@ -138,6 +143,16 @@ void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointT
     // to ensure we are at the right position.
     while (!stop)
     {
+
+      if (action_server_.isPreemptRequested() || !ros::ok())
+      {
+        arm_comm_.stopAPI();
+        arm_comm_.startAPI();
+        action_server_.setPreempted();
+        ROS_INFO_STREAM_NAMED("trajectory_action", "Preempted by preempt request");
+        return;
+      }
+
       // Get the current real angles and normalize them for comparing
       // with the target and adjusting the execution
       arm_comm_.getJointAngles(current_joint_angles);
@@ -166,42 +181,42 @@ void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointT
       // If not in the position yet, adjust the first motor
       if (std::abs(error.Actuator1) > TOLERANCE)
       {
-        point.Position.Actuators.Actuator1 = KP * error.Actuator1;
+        point.Position.Actuators.Actuator1 = controller_p_value_ * error.Actuator1;
         stop = false;
       }
 
       // If not in the position yet, adjust the second motor
       if (std::abs(error.Actuator2) > TOLERANCE)
       {
-        point.Position.Actuators.Actuator2 = KP * error.Actuator2;
+        point.Position.Actuators.Actuator2 = controller_p_value_ * error.Actuator2;
         stop = false;
       }
 
       // If not in the position yet, adjust the third motor
       if (std::abs(error.Actuator3) > TOLERANCE)
       {
-        point.Position.Actuators.Actuator3 = KP * error.Actuator3;
+        point.Position.Actuators.Actuator3 = controller_p_value_ * error.Actuator3;
         stop = false;
       }
 
       // If not in the position yet, adjust the fourth motor
       if (std::abs(error.Actuator4) > TOLERANCE)
       {
-        point.Position.Actuators.Actuator4 = KP * error.Actuator4;
+        point.Position.Actuators.Actuator4 = controller_p_value_ * error.Actuator4;
         stop = false;
       }
 
       // If not in the position yet, adjust the fifth motor
       if (std::abs(error.Actuator5) > TOLERANCE)
       {
-        point.Position.Actuators.Actuator5 = KP * error.Actuator5;
+        point.Position.Actuators.Actuator5 = controller_p_value_ * error.Actuator5;
         stop = false;
       }
 
       // If not in the position yet, adjust the sixth motor
       if (std::abs(error.Actuator6) > TOLERANCE)
       {
-        point.Position.Actuators.Actuator6 = KP * error.Actuator6;
+        point.Position.Actuators.Actuator6 = controller_p_value_ * error.Actuator6;
         stop = false;
       }
 
@@ -213,12 +228,13 @@ void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointT
     }
 
     // If we got here, it seems that we succeeded
+    ROS_INFO_STREAM_NAMED("trajectory_action", "Successfully executed Trajectory. SetSucceeded!");
     action_server_.setSucceeded();
 
   } catch (const std::exception& e)
   {
-    // Something rather terrible has happened - report it!
     ROS_ERROR_STREAM(e.what());
+    ROS_INFO_STREAM_NAMED("trajectory_action", "Something terrible has happened");
     action_server_.setAborted();
   }
 }

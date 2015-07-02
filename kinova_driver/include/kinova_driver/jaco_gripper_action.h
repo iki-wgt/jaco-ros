@@ -36,9 +36,10 @@ private:
   double stall_interval_seconds_;
   double stall_threshold_;
   double rate_hz_;
-  float tolerance_;
-  double                                       encoder_to_radian_ratio_;
-  double                                       radian_to_encoder_ratio_;
+  double tolerance_;
+  double fully_closed_threshold_;
+  double encoder_to_radian_ratio_;
+  double radian_to_encoder_ratio_;
 };
 
 } // namespace
