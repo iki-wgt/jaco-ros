@@ -141,14 +141,14 @@
   <property name="joint_6_lower_limit" value="${-2*J_PI}" />
   <property name="joint_6_upper_limit" value="${2*J_PI}" />
 
-  <property name="joint_finger_1" value="jaco_joint_finger_1" />
+  <property name="joint_finger_1" value="jaco2_joint_finger_1" />
   <property name="joint_finger_1_axis_xyz" value="0 0 1" />
   <property name="joint_finger_1_origin_xyz" value="-0.03978 0 -0.10071" />
   <property name="joint_finger_1_origin_rpy" value="${-J_PI/2} 1.117 ${J_PI}" />
   <property name="joint_finger_1_lower_limit" value="0" />
   <property name="joint_finger_1_upper_limit" value="${J_PI/180*40}" />
 
-  <property name="joint_finger_2" value="jaco_joint_finger_2" />
+  <property name="joint_finger_2" value="jaco2_joint_finger_2" />
   <property name="joint_finger_2_axis_xyz" value="0 0 1" />
   <property name="joint_finger_2_origin_xyz" value="0.03569 0 -0.10071" />
   <property name="joint_finger_2_origin_rpy" value="${J_PI/2} ${J_PI - 1.117} ${J_PI}" />
