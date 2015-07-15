@@ -17,7 +17,7 @@ namespace kinova
 
 JacoTrajectoryActionServer::JacoTrajectoryActionServer(JacoComm &arm_comm, const ros::NodeHandle &nh)
   : arm_comm_(arm_comm),
-    node_handle_(nh, "controller"),
+    node_handle_(nh),
     action_server_(node_handle_,
                    "follow_joint_trajectory",
                    boost::bind(&JacoTrajectoryActionServer::actionCallback, this, _1),
@@ -26,6 +26,14 @@ JacoTrajectoryActionServer::JacoTrajectoryActionServer(JacoComm &arm_comm, const
 
   /*Sets the p value for the velocity controlled end position correction, can be seen as speed */
   node_handle_.param<double>("controller_p_value", controller_p_value_, 2.0);
+
+  double arm_stale_threshold = 0;
+  node_handle_.param<double>("arm_stale_threshold", arm_stale_threshold, 4.0);
+
+  arm_stale_threshold_ = ros::Duration(arm_stale_threshold);
+
+  ROS_INFO_STREAM_NAMED("arm", "controller_p_value " << controller_p_value_);
+  ROS_INFO_STREAM_NAMED("arm", "arm_stale_threshold " << arm_stale_threshold_);
 
   action_server_.start();
   ROS_INFO_STREAM("JACO FollowJointTrajectory action server has started.");
@@ -38,6 +46,9 @@ JacoTrajectoryActionServer::~JacoTrajectoryActionServer()
 void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal)
 {
   //std::cout << "goal: " << *goal << std::endl;
+
+  ROS_INFO_STREAM_NAMED("trajectory_action", "Executing arm trajectory...");
+
   try
   {
     if (arm_comm_.isStopped())
@@ -137,6 +148,10 @@ void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointT
 
     ros::Rate r(100); // The loop below will run at 100Hz (every 4ms)
 
+    ROS_INFO_STREAM_NAMED("trajectory_action", "Starting end position optimization routine ");
+
+    start_time = ros::Time::now();
+
     // This loop finalizes the movement by checking angular distance
     // of joints from the desired configuration. Instead of moving
     // to the last waypoint, we move and check each joint separately
@@ -151,6 +166,14 @@ void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointT
         action_server_.setPreempted();
         ROS_INFO_STREAM_NAMED("trajectory_action", "Preempted by preempt request");
         return;
+      }
+
+      if (arm_stale_threshold_ >= ros::Time::now() - start_time)
+      {
+        ROS_INFO_STREAM_NAMED("trajectory_action", "Set succeeded but staled after waiting " << arm_stale_threshold_ << " seconds.");
+        action_server_.setSucceeded();
+        return;
+
       }
 
       // Get the current real angles and normalize them for comparing

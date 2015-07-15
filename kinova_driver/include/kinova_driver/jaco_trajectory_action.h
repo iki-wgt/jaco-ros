@@ -25,6 +25,7 @@ namespace kinova
         JacoComm &arm_comm_;
         actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> action_server_;
         double controller_p_value_;
+        ros::Duration arm_stale_threshold_;
         
         void convertDHAnglesToPhysical(AngularInfo &angles);
         void convertPhysicalAnglesToDH(AngularInfo &angles);

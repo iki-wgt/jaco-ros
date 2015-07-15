@@ -18,7 +18,7 @@ namespace kinova
 
 JacoGripperActionServer::JacoGripperActionServer(JacoComm &arm_comm, const ros::NodeHandle &nh)
   : arm_comm_(arm_comm),
-    node_handle_(nh, "/gripper_controller"),
+    node_handle_(nh),
     action_server_(node_handle_, "gripper_action",
                    boost::bind(&JacoGripperActionServer::actionCallback, this, _1),
                    false)
@@ -29,9 +29,17 @@ JacoGripperActionServer::JacoGripperActionServer(JacoComm &arm_comm, const ros::
   node_handle_.param<double>("rate_hz", rate_hz_, 10.0);
   node_handle_.param<double>("tolerance", tolerance_, 2.0);
   /*The angle in radians at which the gripper is supposed to be fully closed, so no object was grasped
-  (fully open is 0, fully closed 0.697 (40 Degrees) but sometimes the fingers fully close to even 0.79)
+  (fully open is 0, fully closed sould be 0.697 (40 Degrees) but sometimes the fingers fully close to even 0.79
+  futher tests needed.)
   */
-  node_handle_.param<double>("fully_closed_threshold", fully_closed_threshold_, 0.65);
+  node_handle_.param<double>("fully_closed_threshold", fully_closed_threshold_, 0.729);
+
+  ROS_INFO_STREAM_NAMED("gripper", "Parameters: ");
+  ROS_INFO_STREAM_NAMED("gripper", "stall_interval_seconds " << stall_interval_seconds_);
+  ROS_INFO_STREAM_NAMED("gripper", "stall_threshold " << stall_threshold_);
+  ROS_INFO_STREAM_NAMED("gripper", "rate_hz " << rate_hz_);
+  ROS_INFO_STREAM_NAMED("gripper", "tolerance " << tolerance_);
+  ROS_INFO_STREAM_NAMED("gripper", "fully_closed_threshold " << fully_closed_threshold_);
   
   // Approximative conversion ratio 
   // from finger position (0..6000) 
@@ -142,7 +150,9 @@ void JacoGripperActionServer::actionCallback(const control_msgs::GripperCommandG
 
       if(result.position >= fully_closed_threshold_){
 
-        ROS_ERROR_STREAM_NAMED("gripper","Gripper fully closed, so no object was grasped. Aborting.");
+        ROS_ERROR_STREAM_NAMED("gripper","Gripper fully closed (fully closed threshold is set to " 
+          << fully_closed_threshold_ << " current finger position is " 
+          << result.position << " so no object was grasped. Aborting.");
         action_server_.setAborted(result);
         return;
 
