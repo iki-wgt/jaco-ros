@@ -168,7 +168,7 @@ void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointT
         return;
       }
 
-      if (arm_stale_threshold_ >= ros::Time::now() - start_time)
+      if (arm_stale_threshold_ < ros::Time::now() - start_time)
       {
         ROS_INFO_STREAM_NAMED("trajectory_action", "Set succeeded but staled after waiting " << arm_stale_threshold_ << " seconds.");
         action_server_.setSucceeded();
