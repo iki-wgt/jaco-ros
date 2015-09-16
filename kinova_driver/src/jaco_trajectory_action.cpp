@@ -69,6 +69,7 @@ void JacoTrajectoryActionServer::actionCallback(const control_msgs::FollowJointT
       ROS_ERROR_STREAM_NAMED("trajectory_action","Insufficient joints passed in, expecting 6 but recieved " 
                              << goal_waypoint.positions.size());
       action_server_.setAborted();
+      return;
     }
 
     JacoAngles current_joint_angles, goal_joint_angles;
